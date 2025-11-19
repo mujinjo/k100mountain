@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>대한민국 100대 명산 룰렛</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at top, #e0f4ff, #dfe7ff, #f5f5ff);
+      color: #111827;
+    }
+
+    .app {
+      background: #ffffffee;
+      backdrop-filter: blur(10px);
+      border-radius: 24px;
+      box-shadow: 0 18px 45px rgba(0, 0, 0, 0.12);
+      padding: 24px 24px 20px;
+      max-width: 720px;
+      width: 100%;
+    }
+
+    .header {
+      margin-bottom: 16px;
+    }
+
+    .title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      margin-bottom: 4px;
+    }
+
+    .subtitle {
+      font-size: 0.9rem;
+      color: #555;
+    }
+
+    .roulette-card {
+      margin-top: 16px;
+      padding: 20px;
+      border-radius: 20px;
+      background: linear-gradient(135deg, #f5f7ff, #eef8ff);
+      display: grid;
+      grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+      gap: 16px;
+      align-items: stretch;
+    }
+
+    .current {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .current-label {
+      font-size: 0.9rem;
+      color: #666;
+    }
+
+    .current-display {
+      width: 210px;
+      height: 210px;
+      border-radius: 999px;
+      border: 4px solid #4f46e5;
+      background: radial-gradient(circle at 30% 20%, #ffffff, #e5edff);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 20px;
+      box-shadow:
+        0 0 0 6px rgba(79, 70, 229, 0.08),
+        0 18px 30px rgba(15, 23, 42, 0.18);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .current-display.spinning {
+      transform: scale(1.03);
+      box-shadow:
+        0 0 0 8px rgba(79, 70, 229, 0.14),
+        0 22px 40px rgba(15, 23, 42, 0.3);
+    }
+
+    .current-name {
+      font-size: 1.4rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      color: #111827;
+    }
+
+    .spin-button {
+      padding: 10px 28px;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      background: linear-gradient(135deg, #4f46e5, #6366f1);
+      color: #fff;
+      box-shadow: 0 10px 20px rgba(79, 70, 229, 0.4);
+      transition:
+        transform 0.1s ease,
+        box-shadow 0.1s ease,
+        opacity 0.2s ease;
+    }
+
+    .spin-button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 14px 28px rgba(79, 70, 229, 0.5);
+    }
+
+    .spin-button:active {
+      transform: translateY(1px) scale(0.98);
+      box-shadow: 0 6px 14px rgba(79, 70, 229, 0.35);
+    }
+
+    .spin-button:disabled {
+      opacity: 0.55;
+      cursor: default;
+      box-shadow: none;
+      transform: none;
+    }
+
+    .side {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      gap: 10px;
+    }
+
+    .side-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #374151;
+    }
+
+    .history {
+      flex: 1;
+      background: #ffffff;
+      border-radius: 14px;
+      padding: 10px 10px 8px;
+      box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.22);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .history-list {
+      list-style: none;
+      overflow-y: auto;
+      padding-right: 3px;
+      flex: 1;
+      font-size: 0.86rem;
+    }
+
+    .history-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 3px 6px;
+      border-radius: 8px;
+      margin-bottom: 2px;
+    }
+
+    .history-item:nth-child(odd) {
+      background: #f9fafb;
+    }
+
+    .history-item span {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 140px;
+    }
+
+    .history-badge {
+      font-size: 0.7rem;
+      padding: 2px 6px;
+      border-radius: 999px;
+      background: #eef2ff;
+      color: #4338ca;
+      margin-left: 8px;
+      flex-shrink: 0;
+    }
+
+    .list-container {
+      background: #ffffff;
+      border-radius: 14px;
+      padding: 8px 10px 6px;
+      box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.22);
+      flex-shrink: 0;
+      max-height: 170px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .list-header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+
+    .mountain-count {
+      font-size: 0.78rem;
+      color: #6b7280;
+    }
+
+    .mountain-list {
+      list-style: none;
+      font-size: 0.8rem;
+      line-height: 1.4;
+      overflow-y: auto;
+      padding-right: 3px;
+    }
+
+    .mountain-list li {
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+    }
+
+    .footer {
+      margin-top: 10px;
+      font-size: 0.75rem;
+      color: #9ca3af;
+      text-align: right;
+    }
+
+    @media (max-width: 720px) {
+      .app {
+        margin: 16px;
+        padding: 18px 16px 16px;
+      }
+
+      .roulette-card {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .current-display {
+        width: 180px;
+        height: 180px;
+      }
+
+      .current-name {
+        font-size: 1.2rem;
+      }
+
+      .history-item span {
+        max-width: 160px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="header">
+      <div class="title">대한민국 100대 명산 룰렛</div>
+      <div class="subtitle">산림청 선정 100대 명산 중 하나를 무작위로 골라줍니다.</div>
+    </header>
+
+    <main class="roulette-card">
+      <section class="current">
+        <div class="current-label">이번에 뽑힌 산</div>
+        <div id="display" class="current-display">
+          <div id="currentName" class="current-name">Spin을 눌러 시작하세요</div>
+        </div>
+        <button id="spinButton" class="spin-button" onclick="spinRoulette()">
+          Spin
+        </button>
+      </section>
+
+      <section class="side">
+        <div class="history">
+          <div class="side-title">결과 히스토리</div>
+          <ul id="historyList" class="history-list"></ul>
+        </div>
+
+        <div class="list-container">
+          <div class="list-header-row">
+            <div class="side-title">산림청 100대 명산 목록</div>
+            <div id="mountainCount" class="mountain-count"></div>
+          </div>
+          <ul id="mountainList" class="mountain-list"></ul>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      산림청 선정 100대 명산 목록(2002년 기준)을 바탕으로 구성되었습니다.
+    </footer>
+  </div>
+
+  <script>
+    const mountains = [
+      "관악산","도봉산","북한산","금정산","비슬산","마니산","무등산","계룡산","신불산","가지산",
+      "명지산","화악산","유명산","운악산","축령산","천마산","소요산","용문산","백운산(포천·화천)","감악산","명성산",
+      "대암산","두타산","덕항산","응봉산","점봉산","백덕산","태화산","백운산(정선·평창)","치악산","방태산",
+      "설악산","가리왕산","오봉산","삼악산","가리산","태백산","오대산","공작산","팔봉산","계방산","용화산",
+      "도락산","민주지산","천태산","금수산","월악산",
+      "서대산","대둔산","덕숭산","칠갑산",
+      "선운산","모악산","지리산(본지맥)","적상산","덕유산","변산","강천산","백암산","장안산","내장산","마이산","운장산",
+      "팔영산","백운산(광양)","추월산","조계산","월출산","방장산","천관산","두륜산","깃대봉",
+      "남산(경주 남산)","금오산","황악산","희양산","주흘산","대야산","황장산","청량산","속리산","구병산",
+      "내연산","소백산","성인봉","운문산","주왕산","팔공산",
+      "금산(남해금산)","무학산","재약산","천성산","연화산","화왕산","지리산(사량도)","미륵산(통영)","황석산","황매산","가야산",
+      "한라산"
+    ];
+
+    const display = document.getElementById("display");
+    const currentNameEl = document.getElementById("currentName");
+    const spinButton = document.getElementById("spinButton");
+    const historyList = document.getElementById("historyList");
+    const mountainList = document.getElementById("mountainList");
+    const mountainCount = document.getElementById("mountainCount");
+
+    function renderMountainList() {
+      if (!mountainCount || !mountainList) return;
+      mountainCount.textContent = `총 ${mountains.length}개 산`;
+      mountainList.innerHTML = "";
+      mountains.forEach((name, index) => {
+        const li = document.createElement("li");
+        li.textContent = `${index + 1}. ${name}`;
+        mountainList.appendChild(li);
+      });
+    }
+
+    function addHistory(name) {
+      if (!historyList) return;
+
+      const li = document.createElement("li");
+      li.className = "history-item";
+
+      const label = document.createElement("span");
+      label.textContent = name;
+
+      const badge = document.createElement("span");
+      badge.className = "history-badge";
+      const now = new Date();
+      const hh = String(now.getHours()).padStart(2, "0");
+      const mm = String(now.getMinutes()).padStart(2, "0");
+      badge.textContent = `${hh}:${mm}`;
+
+      li.appendChild(label);
+      li.appendChild(badge);
+
+      historyList.insertBefore(li, historyList.firstChild);
+
+      while (historyList.children.length > 30) {
+        historyList.removeChild(historyList.lastChild);
+      }
+    }
+
+    let isSpinning = false;
+
+    function spinRoulette() {
+      if (isSpinning) return;
+      if (!currentNameEl || !display) return;
+
+      isSpinning = true;
+      if (spinButton) spinButton.disabled = true;
+      display.classList.add("spinning");
+
+      const totalDuration = 2000;
+      const intervalTime = 60;
+      const startTime = Date.now();
+
+      const intervalId = setInterval(() => {
+        const idx = Math.floor(Math.random() * mountains.length);
+        currentNameEl.textContent = mountains[idx];
+
+        const elapsed = Date.now() - startTime;
+        if (elapsed >= totalDuration) {
+          clearInterval(intervalId);
+
+          const finalIndex = Math.floor(Math.random() * mountains.length);
+          const finalName = mountains[finalIndex];
+          currentNameEl.textContent = finalName;
+          addHistory(finalName);
+
+          display.classList.remove("spinning");
+          if (spinButton) spinButton.disabled = false;
+          isSpinning = false;
+        }
+      }, intervalTime);
+    }
+
+    if (spinButton) {
+      spinButton.addEventListener("click", spinRoulette);
+    }
+
+    renderMountainList();
+  </script>
+</body>
+</html>
